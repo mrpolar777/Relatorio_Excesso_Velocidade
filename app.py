@@ -4,12 +4,9 @@ import folium
 import os
 import tempfile
 import time
+import imgkit
 from datetime import datetime
 from pymongo import MongoClient
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 import xlsxwriter
 
 # === CONFIGS INICIAIS ===
@@ -58,7 +55,7 @@ def gerar_mapa_com_pontos(pontos):
 	return mapa
 
 # === INTERFACE STREAMLIT ===
-st.title("Relatório de Excesso de Velocidade (>50km/h) - Dia Inteiro")
+st.title("Relatório de Excesso de Velocidade")
 
 MONGO_URI = st.secrets["MONGO_URI"] if "MONGO_URI" in st.secrets else st.text_input("MongoDB URI")
 if MONGO_URI:
@@ -107,7 +104,7 @@ if gerar:
 
 			vel_max = max(velocidades)
 
-			# NOVA LÓGICA de contagem de picos de velocidade
+			# Lógica de picos
 			qtd_excesso = 0
 			em_excesso = False
 			for v in velocidades:
@@ -117,22 +114,14 @@ if gerar:
 				elif v <= 50:
 					em_excesso = False
 
-			# Salva o mapa em HTML e PNG
+			# Salvar mapa HTML e PNG via imgkit
 			mapa = gerar_mapa_com_pontos(pontos)
 			mapa_html_nome = f"mapa_{placa}.html"
 			mapa_html_path = os.path.join(temp_dir, mapa_html_nome)
 			mapa.save(mapa_html_path)
 
 			temp_img = os.path.join(temp_dir, f"mapa_{placa}.png")
-			options = Options()
-			options.add_argument('--headless')
-			options.add_argument('--window-size=1024,768')
-			service = Service(ChromeDriverManager().install())
-			driver = webdriver.Chrome(service=service, options=options)
-			driver.get("file://" + os.path.abspath(mapa_html_path))
-			time.sleep(3)
-			driver.save_screenshot(temp_img)
-			driver.quit()
+			imgkit.from_file(mapa_html_path, temp_img)
 
 			imagens[placa] = temp_img
 
