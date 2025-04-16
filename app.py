@@ -58,28 +58,28 @@ def gerar_mapa_com_pontos(pontos):
 	return mapa
 
 # === INTERFACE STREAMLIT ===
-st.title("🚗 Relatório de Excesso de Velocidade (>50km/h) - Dia Inteiro")
+st.title("Relatório de Excesso de Velocidade (>50km/h) - Dia Inteiro")
 
 MONGO_URI = st.secrets["MONGO_URI"] if "MONGO_URI" in st.secrets else st.text_input("MongoDB URI")
 if MONGO_URI:
 	client = MongoClient(MONGO_URI)
 	db = client['relatorios_frota']
 else:
-	st.warning("⚠️ Informe a URI do MongoDB para continuar.")
+	st.warning("Informe a URI do MongoDB para continuar.")
 	st.stop()
 
 with st.form("formulario"):
-	st.subheader("🔐 Acesso à API")
+	st.subheader("Acesso à API")
 	login = st.text_input("Login API")
 	senha = st.text_input("Senha API", type="password")
 
-	st.subheader("📆 Parâmetros do Relatório")
+	st.subheader("Parâmetros do Relatório")
 	data_relatorio = st.date_input("Data", value=datetime.today())
 	gerar = st.form_submit_button("Gerar Relatório")
 
 if gerar:
 	try:
-		st.info("🔄 Autenticando e carregando veículos...")
+		st.info("Autenticando e carregando veículos...")
 		token, usuario_id = autenticar(login, senha)
 		veiculos = listar_veiculos(token, usuario_id)
 
@@ -172,8 +172,8 @@ if gerar:
 		workbook.close()
 
 		with open(planilha_path, "rb") as f:
-			st.success("✅ Relatório gerado com sucesso!")
-			st.download_button("📥 Baixar Relatório Excel", f, file_name=os.path.basename(planilha_path))
+			st.success("Relatório gerado com sucesso!")
+			st.download_button("Baixar Relatório Excel", f, file_name=os.path.basename(planilha_path))
 
 	except Exception as e:
 		st.error(f"Erro ao gerar relatório: {e}")
