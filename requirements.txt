@@ -5,5 +5,4 @@ pymongo
 selenium
 webdriver-manager
 xlsxwriter
-wkhtmltopdf
 imgkit
